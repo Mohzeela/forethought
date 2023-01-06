@@ -1,0 +1,13 @@
+groups:
+  - name: uptime
+    rules:
+      - record: job:uptime:average:ft
+        expr: avg without (instance) (up{job="forethought"})
+      - alert: ForethoughtApplicationDown
+        expr: job:uptime:average:ft < .75
+        for: 5m
+        annotations:
+            overview: '{{ printf "%.2f" $value }}% instances are up for {{ $labels.job }}'
+        labels:
+            severity: page
+            team: devops

@@ -1,0 +1,31 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1m
+  receiver: 'slack'
+  routes:
+     - match:
+         severity: page
+       group_by: ['team']
+       receiver: 'slack'
+       routes:
+          - match:
+              team: devops
+            receiver: 'slack'
+receivers:
+- name: 'slack'
+  slack_configs:
+  - channel: "#prometheus"
+    api_url: https://hooks.slack.com/services/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
+    text: "Overview: {{ .CommonAnnotations.overview }}"
+
+inhibit_rules:
+  - source_match:
+      severity: 'page'
+    target_match:
+      severity: 'ticket'
+    equal: ['team']
